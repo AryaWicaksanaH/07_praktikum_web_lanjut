@@ -47,7 +47,18 @@ class MahasiswaController extends Controller
             'no_hp' => 'required',
         ]);
 
-        Mahasiswa::create($request->all());
+        $mahasiswa = new Mahasiswa;
+        $mahasiswa->nim = $request->get('Nim');
+        $mahasiswa->nama = $request->get('Nama');
+        $mahasiswa->jurusan = $request->get('Jurusan');
+        $mahasiswa->save();
+
+        $kelas = new Kelas;
+        $kelas->id = $request->get('Kelas');
+
+        $mahasiswa->kelas()->associate($kelas);
+        $mahasiswa->save();
+
         return redirect()->route('mahasiswa.index')
             ->with('success', 'Mahasiswa Berhasil Ditambahkan');
     }
@@ -63,29 +74,30 @@ class MahasiswaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Mahasiswa $mahasiswa)
+    public function edit($Nim)
     {
-        return view('mahasiswa.edit', compact('mahasiswa'));
+        $mahasiswa = Mahasiswa::with('kelas')->where('nim', $Nim)->first();
+        $kelas = Kelas::all();
+        return view('mahasiswa.edit', compact('mahasiswa','kelas'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Mahasiswa $mahasiswa)
+    public function update(Request $request, $nim)
     {
         $validatedData = $request->validate([
-            'nim' => 'required|integer',
-            'nama' => 'required|string',
-            'kelas' => 'required|string',
-            'jurusan' => 'required|string',
-            'no_hp' => 'required|string',
-            'email' => 'required|string',
-            'tgl_lahir' => 'required|string',
+            'nim' => 'required',
+            'nama' => 'required',
+            'kelas' => 'required',
+            'jurusan' => 'required',
         ]);
 
-        // $mahasiswa->update($validatedData);
-        Mahasiswa::where('nim', $mahasiswa->nim)->update($validatedData);
-        // $mahasiswa->save();
+        $kelas = Kelas;
+        $kelas->id = $request->get('Kelas');
+        
+        $mahasiswa->kelas()->associate($kelas);
+        $mahasiswa->save();
         //jika data berhasil diupdate, akan kembali ke halaman utama
         return redirect()->route('mahasiswa.index')
             ->with('success', 'Mahasiswa Berhasil Diupdate');
