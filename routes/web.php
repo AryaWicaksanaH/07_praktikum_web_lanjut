@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\MahasiswaController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MahasiswaController;
+use Illuminate\Http\Request;
+use App\Http\Controllers\SearchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,8 +16,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Auth::routes();
+Route::resource('mahasiswas', MahasiswaController::class);
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', function () {
+    return view('welcome');
+});
 
-Route::resource('mahasiswa', MahasiswaController::class);
+Route::get('search', [SearchController::class, 'search']);
+
+Route::get('mahasiswa/{mahasiswa}/khs', [MahasiswaController::class, 'khs'])->name('mahasiswa.khs');
